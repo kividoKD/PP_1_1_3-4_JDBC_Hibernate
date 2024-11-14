@@ -15,6 +15,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     }
 
+    @Override
     public void createUsersTable() {
         sql = "CREATE TABLE users(" +
                 "id BIGINT PRIMARY KEY UNIQUE NOT NULL AUTO_INCREMENT," +
@@ -35,13 +36,14 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
+    @Override
     public void dropUsersTable() {
         sql = "DROP TABLE users";
 
         try (Connection connection = util.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             Statement statement = connection.createStatement()) {
             if (tableExist()) {
-                preparedStatement.executeUpdate();
+                statement.executeUpdate(sql);
                 System.out.println("Table Deleted");
             } else {
                 System.out.println("Unknown table 'mydb.users'");
@@ -51,6 +53,7 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
+    @Override
     public void saveUser(String name, String lastName, byte age) {
         sql = "INSERT INTO users (name, last_name, age) VALUES(?, ?, ?)";
 
@@ -66,6 +69,7 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
+    @Override
     public void removeUserById(long id) {
         sql = "DELETE FROM users WHERE id = ?";
 
@@ -79,13 +83,14 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
+    @Override
     public List<User> getAllUsers() {
         sql = "SELECT name, last_name, age FROM users";
         List<User> userList = new ArrayList<>();
 
         try (Connection connection = util.getConnection();
-             Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sql);
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 User user = new User(
@@ -100,6 +105,7 @@ public class UserDaoJDBCImpl implements UserDao {
         return userList;
     }
 
+    @Override
     public void cleanUsersTable() {
         sql = "DELETE FROM users";
 
@@ -111,9 +117,6 @@ public class UserDaoJDBCImpl implements UserDao {
             e.printStackTrace();
         }
     }
-
-
-
 
     public boolean tableExist() {
         try (Connection connection = util.getConnection()) {

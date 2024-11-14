@@ -9,9 +9,14 @@ public class Util {
     private static final String user = "root";
     private static final String password = "root";
 
-    public Connection getConnection() throws SQLException {
+    public Connection getConnection() {
         Connection connection = null;
-        connection = DriverManager.getConnection(url, user, password);
+        try {
+            connection = DriverManager.getConnection(url, user, password);
+        } catch (SQLException e) {
+            System.out.println("Ошибка подключения к БД");
+            e.printStackTrace();
+        }
         return connection;
     }
 }
